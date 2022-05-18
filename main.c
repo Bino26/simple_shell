@@ -1,49 +1,134 @@
 #include "shell.h"
-/**
- * main - This is a simple shell created by
- * for ALX Team Project
- * Return: 0 if success
- */
-int main(void)
-{
-	ssize_t bytes_rd = 0; /** Bytes read from a getline*/
-	size_t bf_size = 0; /**Buffer size*/
-	char *entry = NULL, *arguments[20]; /**String of args that enters the usr*/
-	int counter = 1, vf_stat = 0, exist_stat = 0, exit_stat = 0, blt_stat = 0;
 
-	_printp("$ ", 2);/**prompt mini-shell*/
-	bytes_rd = getline(&entry, &bf_size, stdin); /**sizeof entry, o -1 (EOF))*/
-	while (bytes_rd != -1)
+void sig_handler(int sig);
+int execute(char **args, char **front);
+
+/**
+ * sig_handler - Prints a new prompt upon a signal.
+ * @sig: The signal.
+ */
+void sig_handler(int sig)
+{
+	char *new_prompt = "\n$ ";
+
+	(void)sig;
+	signal(SIGINT, sig_handler);
+	write(STDIN_FILENO, new_prompt, 3);
+}
+
+/**
+ * execute - Executes a command in a child process.
+ * @args: An array of arguments.
+ * @front: A double pointer to the beginning of args.
+ *
+ * Return: If an error occurs - a corresponding error code.
+ *         O/w - The exit value of the last executed command.
+ */
+int execute(char **args, char **front)
+{
+	pid_t child_pid;
+	int status, flag = 0, ret = 0;
+	char *command = args[0];
+
+	if (command[0] != '/' && command[0] != '.')
 	{
-		if (*entry != '\n')
-		{
-			fill_args(entry, arguments);
-			if (arguments[0] != NULL)
-			{
-				exist_stat = exist(arguments[0]);/**Exist evaluates if the path entered exists*/
-				if (exist_stat != 0)/**Did not find the file*/
-				{
-					vf_stat = verify_path(arguments);
-					if (vf_stat == 0)
-						exit_stat = exec(arguments), free(entry), free(*arguments);
-					else
-					{
-					blt_stat = verify_blt(arguments, exit_stat);
-					if (blt_stat != 0)
-						exit_stat = print_not_found(arguments, counter), free(entry);
-					}
-				}
-				else /**Found the file*/
-					exit_stat = exec(arguments), free(entry);
-			}
-			else
-				free(entry);
-		}
-		else if (*entry == '\n')
-			free(entry);
-		entry = NULL, counter++;
-		_printp("$ ", 2), bytes_rd = getline(&entry, &bf_size, stdin);
+		flag = 1;
+		command = get_location(command);
 	}
-	last_free(entry);
-	return (exit_stat);
+
+	if (!command || (access(command, F_OK) == -1))
+	{
+		if (errno == EACCES)
+			ret = (create_error(args, 126));
+		else
+			ret = (create_error(args, 127));
+	}
+	else
+	{
+		child_pid = fork();
+		if (child_pid == -1)
+		{
+			if (flag)
+				free(command);
+			perror("Error child:");
+			return (1);
+		}
+		if (child_pid == 0)
+		{
+			execve(command, args, environ);
+			if (errno == EACCES)
+				ret = (create_error(args, 126));
+			free_env();
+			free_args(args, front);
+			free_alias_list(aliases);
+			_exit(ret);
+		}
+		else
+		{
+			wait(&status);
+			ret = WEXITSTATUS(status);
+		}
+	}
+	if (flag)
+		free(command);
+	return (ret);
+}
+
+/**
+ * main - Runs a simple UNIX command interpreter.
+ * @argc: The number of arguments supplied to the program.
+ * @argv: An array of pointers to the arguments.
+ *
+ * Return: The return value of the last executed command.
+ */
+int main(int argc, char *argv[])
+{
+	int ret = 0, retn;
+	int *exe_ret = &retn;
+	char *prompt = "$ ", *new_line = "\n";
+
+	name = argv[0];
+	hist = 1;
+	aliases = NULL;
+	signal(SIGINT, sig_handler);
+
+	*exe_ret = 0;
+	environ = _copyenv();
+	if (!environ)
+		exit(-100);
+
+	if (argc != 1)
+	{
+		ret = proc_file_commands(argv[1], exe_ret);
+		free_env();
+		free_alias_list(aliases);
+		return (*exe_ret);
+	}
+
+	if (!isatty(STDIN_FILENO))
+	{
+		while (ret != END_OF_FILE && ret != EXIT)
+			ret = handle_args(exe_ret);
+		free_env();
+		free_alias_list(aliases);
+		return (*exe_ret);
+	}
+
+	while (1)
+	{
+		write(STDOUT_FILENO, prompt, 2);
+		ret = handle_args(exe_ret);
+		if (ret == END_OF_FILE || ret == EXIT)
+		{
+			if (ret == END_OF_FILE)
+				write(STDOUT_FILENO, new_line, 1);
+			free_env();
+			free_alias_list(aliases);
+			exit(*exe_ret);
+		}
+	}
+
+	free_env();
+	free_alias_list(aliases);
+	return (*exe_ret);
 }
