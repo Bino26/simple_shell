@@ -1,7 +1,8 @@
-# hsh
+# hsh 
 
 
-This repository contains the files for alx-Holberton's simple_shell project. It can be compiled using GCC and will execute a simple shell that can be used for some basic tasks and programs most commonly found in the $PATH.
+
+This repository contains the files for alx-Holberton's Simple_Shell project. It can be compiled using GCC and will execute a simple shell that can be used for some basic tasks and programs most commonly found in the $PATH.
 
 ## Pre-requisites
 Authorized functions and macros:
