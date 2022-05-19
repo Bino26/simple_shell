@@ -58,4 +58,6 @@ gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
 
 ## Usage
 
-Le simple_shell est conçu pour exécuter des commandes de la même manière que sh, mais avec des fonctionnalités plus limitées. Le développement de cette coque est en cours.
+The simple_shell is designed to execute commands in a similar manner to sh, however with more limited functionality. The development of this shell is ongoing...
+
+
