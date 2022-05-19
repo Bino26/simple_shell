@@ -54,3 +54,4 @@ gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
  - Change directories into the repository: cd simple_shell
  - Compile: gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
  - Run the shell in interactive mode: ./hsh
+ - Or run the shell in non-interactive mode: example echo "pwd" | ./hsh
