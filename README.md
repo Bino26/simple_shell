@@ -51,3 +51,4 @@ gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
 
 ## Installation
  - Clone this repository: git clone "https://github.com/Bino26/simple_shell.git"
+ - Change directories into the repository: cd simple_shell
