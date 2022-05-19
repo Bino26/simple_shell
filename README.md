@@ -55,3 +55,7 @@ gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
  - Compile: gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
  - Run the shell in interactive mode: ./hsh
  - Or run the shell in non-interactive mode: example echo "pwd" | ./hsh
+
+## Usage
+
+Le simple_shell est conçu pour exécuter des commandes de la même manière que sh, mais avec des fonctionnalités plus limitées. Le développement de cette coque est en cours.
