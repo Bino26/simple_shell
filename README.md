@@ -8,6 +8,8 @@ This repository contains the files for alx-Holberton's Simple_Shell project. It 
 
 simple_shell is a command line interpreter, or shell, in the tradition of the first Unix shell written by Ken Thompson in 1971. This shell is intentionally minimalistic, yet includes the basic functionality of a traditional Unix-like command line user interface. Standard functions and system calls employed in simple_shell include: access, execve, exit, fork, free, fstat, getline, malloc, perror, signal, stat, wait, write.
 
+
+
 ## Pre-requisites
 Authorized functions and macros:
 - access (man 2 access)
@@ -47,4 +49,5 @@ Authorized functions and macros:
 gcc -Wall -Werror -Wextra -pedantic *.c -o hsh
 ```
 
-
+## Installation
+ - Clone this repository: git clone "https://github.com/Bino26/simple_shell.git"
